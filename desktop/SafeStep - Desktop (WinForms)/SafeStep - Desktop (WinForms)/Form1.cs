@@ -73,6 +73,18 @@ namespace SafeStep___Desktop__WinForms_
             InitializeComponent();
         }
 
+        private void SetAlarmVisualState(string title, string detail, Color panelColor, Color accentColor, string badgeText, string icon)
+        {
+            lblAlarm.Text = title;
+            lblAlarmDetail.Text = detail;
+            pnlAlarm.BackColor = panelColor;
+            lblAlarmBadge.Text = badgeText;
+            lblAlarmBadge.BackColor = accentColor;
+            lblAlarmIcon.Text = icon;
+            lblAlarmIcon.ForeColor = accentColor;
+            lblAlarmDetail.ForeColor = accentColor;
+        }
+
         /// <summary>
         /// Runs when the form first loads.
         /// Sets up the baud rate dropdown, refreshes COM ports,
@@ -114,7 +126,13 @@ namespace SafeStep___Desktop__WinForms_
             btnConnect.Enabled = true;
 
             // Set all display labels to default idle values
-            lblAlarm.Text = "No active alarms";
+            SetAlarmVisualState(
+                "System Normal",
+                "No active alarms",
+                Color.FromArgb(220, 252, 231),
+                Color.FromArgb(22, 101, 52),
+                "SAFE",
+                "✓");
             lblDistance.Text = "0.0 m";
             lblDistanceTime.Text = "Last updated: --:--";
             lblBattery.Text = "0%";
@@ -385,8 +403,13 @@ namespace SafeStep___Desktop__WinForms_
             // All zones clear — reset alarm panel to green
             else
             {
-                pnlAlarm.BackColor = Color.LightGreen;
-                lblAlarm.Text = $"All clear — {msg.TagName} in safe range";
+                SetAlarmVisualState(
+                    "System Normal",
+                    $"{msg.TagName} is in safe range",
+                    Color.FromArgb(220, 252, 231),
+                    Color.FromArgb(22, 101, 52),
+                    "SAFE",
+                    "✓");
             }
         }
 
@@ -423,17 +446,59 @@ namespace SafeStep___Desktop__WinForms_
                 }
             }
 
-            // Update the alarm panel
-            pnlAlarm.BackColor = color;
-            lblAlarm.Text = "ALARM: " + warningText;
+            if (color == Color.Red)
+            {
+                SetAlarmVisualState(
+                    "Critical Alarm",
+                    warningText,
+                    Color.FromArgb(254, 226, 226),
+                    Color.FromArgb(185, 28, 28),
+                    "CRITICAL",
+                    "⚠");
+            }
+            else if (color == Color.Orange)
+            {
+                SetAlarmVisualState(
+                    "Warning Active",
+                    warningText,
+                    Color.FromArgb(255, 237, 213),
+                    Color.FromArgb(194, 65, 12),
+                    "WARNING",
+                    "! ");
+            }
+            else if (color == Color.Yellow)
+            {
+                SetAlarmVisualState(
+                    "Caution",
+                    warningText,
+                    Color.FromArgb(254, 249, 195),
+                    Color.FromArgb(161, 98, 7),
+                    "CAUTION",
+                    "•");
+            }
+            else
+            {
+                SetAlarmVisualState(
+                    "Tag Lost",
+                    warningText,
+                    Color.FromArgb(229, 231, 235),
+                    Color.FromArgb(75, 85, 99),
+                    "OFFLINE",
+                    "? ");
+            }
 
             // Auto-reset after 5 seconds
             var timer = new System.Windows.Forms.Timer();
             timer.Interval = 5000;
             timer.Tick += (s, e) =>
             {
-                pnlAlarm.BackColor = Color.LightGreen;
-                lblAlarm.Text = "No active alarms";
+                SetAlarmVisualState(
+                    "System Normal",
+                    "No active alarms",
+                    Color.FromArgb(220, 252, 231),
+                    Color.FromArgb(22, 101, 52),
+                    "SAFE",
+                    "✓");
                 timer.Stop();
                 timer.Dispose();
             };
@@ -666,8 +731,13 @@ namespace SafeStep___Desktop__WinForms_
                     TriggerZoneWarning("ZONE 1 — CAUTION (3–5m)", Color.Yellow);
                 else
                 {
-                    pnlAlarm.BackColor = Color.LightGreen;
-                    lblAlarm.Text = $"All clear — {msg.TagName} in safe range";
+                    SetAlarmVisualState(
+                        "System Normal",
+                        $"{msg.TagName} is in safe range",
+                        Color.FromArgb(220, 252, 231),
+                        Color.FromArgb(22, 101, 52),
+                        "SAFE",
+                        "✓");
                 }
             }
         }
