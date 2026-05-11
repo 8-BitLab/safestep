@@ -603,5 +603,10 @@ namespace SafeStep___Desktop__WinForms_
             public string DetectedName { get; set; } = string.Empty;
             public string FriendlyName { get; set; } = string.Empty;
         }
+
+        private void chkAutoConnect_CheckedChanged(object sender, EventArgs e)
+        {
+
+        }
     }
 }
